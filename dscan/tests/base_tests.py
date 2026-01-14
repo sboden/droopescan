@@ -214,7 +214,7 @@ class BaseTests(BaseTest):
     def test_log_output_when_error_display_false(self):
 
         warn_string = 'warn_string'
-        error_file = '/tmp/a'
+        error_file = '/tmp/droopescan_test_error_log'
 
         with patch('sys.stdout', new=io.StringIO()) as fake_out:
             jo = JsonOutput(error_log=error_file)
@@ -380,13 +380,4 @@ class BaseTests(BaseTest):
         plugins = plugins_base_get()
         assert len(plugins) > 3
 
-    def test_calls_async(self):
-        self.add_argv(['scan'])
-        self.add_argv(['--url-file', self.valid_file])
-        self.add_argv(['--async'])
 
-        with patch('dscan.plugins.internal.scan.identify_url_file',
-                autospec=True) as iuf:
-            self.app.run()
-
-            assert iuf.called

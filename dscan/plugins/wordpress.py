@@ -5,6 +5,7 @@ from dscan.plugins import BasePlugin
 import dscan.common.update_api as ua
 import dscan.common.versions
 import requests
+import re
 
 class Wordpress(BasePlugin):
     plugins_base_url = "%swp-content/plugins/%s/"
@@ -85,6 +86,63 @@ class Wordpress(BasePlugin):
             themes.append(theme['slug'])
 
         return plugins, themes
+
+    def enumerate_version_from_html(self, url, timeout=15, headers={}):
+        """
+        Extract exact version from HTML meta generator tag.
+
+        @param url: the base URL to check
+        @param timeout: request timeout in seconds
+        @param headers: headers to pass to requests.get()
+        @return: version string (e.g., "6.9") or None if not found
+        """
+        try:
+            response = self.session.get(url, timeout=timeout, headers=headers, verify=False)
+
+            if response.status_code in [200, 403]:
+                # Pattern matches: <meta name="generator" content="WordPress 6.9" />
+                pattern = r'meta\s+name=["\']generator["\']\s+content=["\']WordPress\s+([0-9.]+)["\']'
+                match = re.search(pattern, response.text, re.IGNORECASE)
+
+                if match:
+                    return match.group(1)
+
+        except Exception:
+            pass
+
+        return None
+
+    def enumerate_version(self, url, threads=10, verb='head',
+            timeout=15, hide_progressbar=False, headers={}):
+        """
+        Override parent method to try HTML parsing first, then fall back to fingerprinting.
+
+        @param url: the url to check
+        @param threads: number of threads for fingerprinting
+        @param verb: HTTP verb to use
+        @param timeout: request timeout in seconds
+        @param hide_progressbar: whether to hide progress bar
+        @param headers: headers to pass to requests
+        @return: (possible_versions, is_empty)
+        """
+        # Try to get exact version from HTML generator tag first
+        html_version = self.enumerate_version_from_html(url, timeout, headers)
+
+        # Always do fingerprinting for verification
+        fingerprint_versions, is_empty = super(Wordpress, self).enumerate_version(
+            url, threads, verb, timeout, hide_progressbar, headers
+        )
+
+        if html_version:
+            # If we found a version in HTML, check if it's consistent with fingerprinting
+            if not fingerprint_versions or html_version in fingerprint_versions:
+                # HTML version is consistent, use it as the definitive answer
+                return [html_version], False
+            else:
+                # HTML version conflicts with fingerprinting - trust fingerprinting
+                return fingerprint_versions, is_empty
+
+        return fingerprint_versions, is_empty
 
 def load(app=None):
     handler.register(Wordpress)

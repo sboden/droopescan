@@ -238,6 +238,15 @@ droopescan scan drupal --url http://localhost/drupal
 applications with bad SSL, droopescan allows self-signed or otherwise invalid
 certificates. ˙ ͜ʟ˙
 
+## Cookie Authentication
+
+You can also bypass authentication by passing a valid session cookie using the `--cookie` argument.
+This is useful if you want to login via a browser and then use the session cookie for scanning.
+
+```
+    droopescan scan drupal -u http://example.org --cookie "SESSd06e232=...; other=..."
+```
+
 ## Output
 
 This application supports both "standard output", meant for human consumption,
@@ -460,7 +469,8 @@ rather than the master. Issues can be raised on the issue tracker here
 on GitHub.
 
 To run tests, some dependencies must be installed. Running the following
-commands will result in them being installed and the tests being ran:
+commands will result in them being installed and the tests being ran.
+Please ensure that `nosetests` is in your PATH:
 
 ```
     apt-get install libxslt1-dev libxml2-dev zlib1g-dev python python-pip python-dev python3 python3-pip python3-dev

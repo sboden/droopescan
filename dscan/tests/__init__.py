@@ -62,6 +62,7 @@ class BaseTest(test.CementTestCase):
         'debug': False,
         'enumerate': 'a',
         'headers': {},
+        'cookie': None,
         'hide_progressbar': False,
         'user_agent': 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'
     }
@@ -170,9 +171,17 @@ class BaseTest(test.CementTestCase):
         for status_code in data_obj:
             for item in data_obj[status_code]:
                 url = base_url % item
-                responses.add(verb, url,
-                        body=str(status_code), status=status_code,
-                        adding_headers=headers)
+                body_content = str(status_code)
+                req_headers = headers.copy() if isinstance(headers, dict) else {}
+                if verb == responses.HEAD:
+                    req_headers['Content-Length'] = str(len(body_content))
+                    responses.add(verb, url,
+                            body="", status=status_code,
+                            adding_headers=req_headers)
+                else:
+                    responses.add(verb, url,
+                            body=body_content, status=status_code,
+                            adding_headers=headers)
 
     def mock_all_enumerate(self, plugin_name):
         all = []

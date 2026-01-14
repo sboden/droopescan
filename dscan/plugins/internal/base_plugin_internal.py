@@ -96,6 +96,7 @@ class BasePluginInternal(controller.CementBaseController):
         timeout = pargs.timeout
         timeout_host = pargs.timeout_host
         user_agent = pargs.user_agent
+        cookie = pargs.cookie
         hide_progressbar = pargs.hide_progressbar
         debug_requests = pargs.debug_requests
         follow_redirects = pargs.follow_redirects
@@ -267,6 +268,8 @@ class BasePluginInternal(controller.CementBaseController):
 
         self.session.verify = False
         self.session.headers['User-Agent'] = opts["user_agent"]
+        if opts['cookie']:
+            self.session.headers['Cookie'] = opts['cookie']
 
         debug_requests = opts['debug_requests']
         if debug_requests:
@@ -530,14 +533,22 @@ class BasePluginInternal(controller.CementBaseController):
                     ok_200 = True
                     break
 
-        len_content = len(ok_resp.content)
+        if len(ok_resp.content) == 0 and 'Content-Length' in ok_resp.headers:
+            len_content = int(ok_resp.headers['Content-Length'])
+        else:
+            len_content = len(ok_resp.content)
 
         return ok_200, len_content
 
     def _determine_fake_200(self, requests_verb, url):
         response = requests_verb(url + self.not_found_url)
 
-        return response.status_code == 200, len(response.content)
+        if len(response.content) == 0 and 'Content-Length' in response.headers:
+            len_content = int(response.headers['Content-Length'])
+        else:
+            len_content = len(response.content)
+
+        return response.status_code == 200, len_content
 
     def _determine_fake_200_module(self, requests_verb, url_template, url):
         fake_200_url = url_template % (url, self.not_found_module)

@@ -297,9 +297,9 @@ class BaseHttpTests(BaseTest):
         self.add_argv(self.param_plugins)
 
         responses.add(responses.HEAD, self.base_url +
-                self.scanner.not_found_url, body='A'*1337)
+                self.scanner.not_found_url, body="", adding_headers={'Content-Length': '1337'})
         responses.add(responses.HEAD, self.base_url +
-                'misc/drupal.js', body='A'*15000)
+                'misc/drupal.js', body="", adding_headers={'Content-Length': '15000'})
         responses.add(responses.HEAD, self.base_url + Drupal.forbidden_url)
 
         m = self.mock_controller('drupal', 'enumerate_plugins')

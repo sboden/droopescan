@@ -65,6 +65,13 @@ class Scan(BasePlugin):
                     with this value.""", default=None)),
                 (['--user-agent'], dict(action='store', help='''Override User Agent
                 header performing the scan requests.''', default=BasePluginInternal.DEFAULT_UA, type=str)),
+                (['--cookie'], dict(action='store', help='''(HTTP) Pass the data
+                    to the HTTP server in the Cookie header. It is supposedly
+                    the data previously received from the server in a
+                    "Set-Cookie:" line. The data should be in the format
+                    "NAME1=VALUE1; NAME2=VALUE2". This way you can bypass
+                    Drupal authentication e.g. (login to Drupal, copy session
+                    cookie, run droopescan)''', default=None, type=str)),
                 (['--massscan-override'], dict(action='store_true',
                     help="""Overrides defaults with defaults convenient for
                     mass-scanning of hosts.""", default=False)),
