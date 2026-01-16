@@ -271,6 +271,7 @@ class BasePluginInternal(controller.CementBaseController):
 
         self.session.verify = False
         self.session.headers['User-Agent'] = opts["user_agent"]
+        self.session.headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
         if opts['cookie']:
             self.session.headers['Cookie'] = opts['cookie']
 
