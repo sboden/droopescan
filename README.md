@@ -149,6 +149,12 @@ pip install -e .
 pip install -r requirements.txt
 ```
 
+**Note:** During installation, you may see an error message about building a wheel for the cement dependency:
+```
+ERROR: Failed building wheel for cement
+```
+This is expected and harmless. The installation will automatically fall back to using `setup.py install` and complete successfully. The cement package will work correctly despite this warning.
+
 ### Step 4: Verify installation
 
 ```bash
