@@ -513,7 +513,7 @@ class BaseHttpTests(BaseTest):
         result = self.scanner._determine_redirect(self.base_url,
                 Verb.head)
 
-        assert result == self.base_url_https
+        assert result == self.base_url
 
     def test_redirect_no_relative(self):
         """
@@ -547,14 +547,14 @@ class BaseHttpTests(BaseTest):
     def test_redirect_no_same_url(self):
         """
         If redirects take us somewhere within the same URL of base url, we
-        should return the base url.
+        should follow it.
         """
         responses.reset()
         responses.add(responses.HEAD, self.base_url, status=301,
                 adding_headers={'location': self.base_url + "install.php"})
 
         ru = self.scanner._determine_redirect(self.base_url, 'head')
-        assert ru == self.base_url
+        assert ru == self.base_url + "install.php"
 
     def test_url_file_calls_all(self):
         self.add_argv(['--url-file', self.valid_file])

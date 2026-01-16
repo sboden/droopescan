@@ -482,7 +482,7 @@ class BasePluginInternal(controller.CementBaseController):
             base_supplied = base_url(url)
 
             same_base = base_redir == base_supplied
-            if same_base:
+            if not same_base:
                 url_new = url
 
         return url_new
