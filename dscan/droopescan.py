@@ -111,6 +111,10 @@ def reorder_argv_for_backward_compatibility(argv):
     return new_argv
 
 def main():
+    # Print help when no arguments are provided
+    if len(sys.argv) == 1:
+        sys.argv.append('--help')
+
     # Reorder argv for backward compatibility with Cement 2.x argument order
     sys.argv = reorder_argv_for_backward_compatibility(sys.argv)
 

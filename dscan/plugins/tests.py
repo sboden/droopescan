@@ -54,6 +54,9 @@ class Tests(HumanBasePlugin):
                 required=False, default=False)),
         ]
 
+    def _default(self):
+        self.default()
+
     @ex(help='Run unit tests')
     def default(self):
         env = {}

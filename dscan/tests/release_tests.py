@@ -16,7 +16,7 @@ class ReleaseTests(BaseTest):
     def setUp(self):
         super(ReleaseTests, self).setUp()
         self._init_scanner()
-        self.add_argv(['release'])
+        self.add_argv(['release', 'default'])
         self.release = plugins.release.Release()
 
     def p(self, *args, **kwargs):
@@ -81,7 +81,8 @@ class ReleaseTests(BaseTest):
         assert raised
 
     def test_skips_external(self):
-        self.add_argv(['--skip-external'])
+        self.clear_argv()
+        self.add_argv(['release', '--skip-external', 'default'])
         internal, external, _ = self.mock_tests(raise_human=True)
 
         raised = False

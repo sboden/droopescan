@@ -32,7 +32,7 @@ class BaseTests(BaseTest):
 
     @test.raises(RuntimeError)
     def test_errors_when_no_url_identify(self):
-        self.add_argv(['scan'])
+        self.add_argv(['scan', 'default'])
         self.app.run()
 
     @test.raises(IOError)
@@ -139,14 +139,13 @@ class BaseTests(BaseTest):
         self.add_argv(self.param_plugins)
         self.add_argv(['--output', 'json'])
 
-        try:
-            self.app.run()
-        except:
-            pass
-
-        drupal = self.get_dispatched_controller(self.app)
-
-        assert isinstance(drupal.out, JsonOutput)
+        with patch('dscan.plugins.internal.base_plugin_internal.JsonOutput') as jo:
+            try:
+                self.app.run()
+            except:
+                pass
+            
+            assert jo.called
 
     def test_output_defaults(self):
         jo = JsonOutput()
@@ -159,25 +158,25 @@ class BaseTests(BaseTest):
         self.add_argv(['scan', 'drupal'])
         self.add_argv(['--url-file', self.valid_file])
 
-        try:
-            self.app.run()
-        except:
-            pass
-
-        drupal = self.get_dispatched_controller(self.app)
-        assert isinstance(drupal.out, JsonOutput)
+        with patch('dscan.plugins.internal.base_plugin_internal.JsonOutput') as jo:
+            try:
+                self.app.run()
+            except:
+                pass
+            
+            assert jo.called
 
     def test_output_standard_when_normal_url(self):
         self.add_argv(['scan', 'drupal'])
-        self.add_argv(['--url-file', self.valid_file])
+        self.add_argv(['-u', self.base_url])
 
-        try:
-            self.app.run()
-        except:
-            pass
-
-        drupal = self.get_dispatched_controller(self.app)
-        assert isinstance(drupal.out, StandardOutput)
+        with patch('dscan.plugins.internal.base_plugin_internal.StandardOutput') as so:
+            try:
+                self.app.run()
+            except:
+                pass
+            
+            assert so.called
 
     def test_no_output_when_error_display_false(self):
         with patch('sys.stdout', new=io.BytesIO()) as fake_out:
