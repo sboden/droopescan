@@ -112,6 +112,77 @@ pip install -r requirements.txt
 The master branch corresponds to the latest release (what is in pypi).
 Development branch is unstable and all pull requests must be made against it.
 
+## Development Setup (Recommended)
+
+For development work, it's recommended to use a Python virtual environment to isolate dependencies:
+
+### Step 1: Create a virtual environment
+
+```bash
+# Clone the repository
+git clone https://github.com/droope/droopescan.git
+cd droopescan
+
+# Create a virtual environment
+python3 -m venv venv
+```
+
+### Step 2: Activate the virtual environment
+
+```bash
+# On Linux/Mac
+source venv/bin/activate
+
+# On Windows
+venv\Scripts\activate
+```
+
+Once activated, your shell prompt will show `(venv)` prefix.
+
+### Step 3: Install dependencies
+
+```bash
+# Install droopescan in editable mode with dependencies
+pip install -e .
+
+# Or install dependencies manually
+pip install -r requirements.txt
+```
+
+### Step 4: Verify installation
+
+```bash
+# Test the installation
+droopescan --help
+./droopescan scan --help
+```
+
+### What gets installed
+
+The setup automatically installs these core dependencies:
+- **cement** (>=2.6,<2.6.99): CLI framework for building command-line applications
+- **requests**: HTTP library for making web requests
+- **pystache**: Mustache template engine for Python
+
+### Deactivating the virtual environment
+
+When you're done working:
+
+```bash
+deactivate
+```
+
+### Git Ignore
+
+The following directories should NOT be committed to git:
+- `venv/` - Virtual environment
+- `cement/` - Installed dependency (managed by pip)
+- `__pycache__/` - Python bytecode cache
+- `droopescan.egg-info/` - Package metadata
+- `build/` and `dist/` - Build artifacts
+
+These are already configured in `.gitignore`.
+
 ## BlackArch
 BlackArch [package](https://github.com/BlackArch/blackarch/blob/master/packages/droopescan/PKGBUILD) installation (maintained by a third party):
 
