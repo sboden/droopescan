@@ -97,6 +97,10 @@ class Scan(BasePlugin):
                 (['--resume'], dict(action='store_true', help='''Resume the url_file
                     scan as of the last known scanned url. Must be used in
                     conjunction with --error-log.''', default=None)),
+                (['--no-fingerprint-fallback'], dict(action='store_true', help='''Only use
+                    file fingerprinting for version detection. Disables HTML-based
+                    fallback methods when fingerprinting returns multiple versions.
+                    Use this for more deterministic results.''', default=False)),
             ]
 
     @controller.expose(hide=True)
@@ -221,10 +225,13 @@ class Scan(BasePlugin):
 
     def _process_cms_identify(self, url, opts, instances, follow_redirects):
         self.out.debug('scan._process_cms_identify -> %s' % url)
-        try:
-            url, host_header = url, opts['headers']['Host']
-        except:
+        if isinstance(url, tuple):
+            url, host_header = url
+        else:
             url, host_header = self._process_host_line(url)
+
+        if not host_header and 'Host' in opts['headers']:
+            host_header = opts['headers']['Host']
 
         url = f.repair_url(url)
 

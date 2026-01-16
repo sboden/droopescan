@@ -113,7 +113,7 @@ class Wordpress(BasePlugin):
         return None
 
     def enumerate_version(self, url, threads=10, verb='head',
-            timeout=15, hide_progressbar=False, headers={}):
+            timeout=15, hide_progressbar=False, headers={}, no_fingerprint_fallback=False):
         """
         Override parent method to try HTML parsing first, then fall back to fingerprinting.
 
@@ -123,15 +123,20 @@ class Wordpress(BasePlugin):
         @param timeout: request timeout in seconds
         @param hide_progressbar: whether to hide progress bar
         @param headers: headers to pass to requests
+        @param no_fingerprint_fallback: if True, only use file fingerprinting (no HTML fallbacks)
         @return: (possible_versions, is_empty)
         """
-        # Try to get exact version from HTML generator tag first
-        html_version = self.enumerate_version_from_html(url, timeout, headers)
-
-        # Always do fingerprinting for verification
+        # Always do fingerprinting
         fingerprint_versions, is_empty = super(Wordpress, self).enumerate_version(
-            url, threads, verb, timeout, hide_progressbar, headers
+            url, threads, verb, timeout, hide_progressbar, headers, no_fingerprint_fallback
         )
+
+        # If no_fingerprint_fallback mode is enabled, return fingerprint results without HTML fallbacks
+        if no_fingerprint_fallback:
+            return fingerprint_versions, is_empty
+
+        # Try to get exact version from HTML generator tag
+        html_version = self.enumerate_version_from_html(url, timeout, headers)
 
         if html_version:
             # If we found a version in HTML, check if it's consistent with fingerprinting

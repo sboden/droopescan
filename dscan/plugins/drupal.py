@@ -95,38 +95,58 @@ class Drupal(BasePlugin):
 
     def enumerate_version_from_html(self, url, timeout=15, headers={}):
         """
-        Extract exact version from HTML query parameters in asset URLs.
-        Drupal 8+ adds ?v=X.Y.Z to JS/CSS URLs for cache busting.
-        This is more accurate than MD5 fingerprinting for patch versions.
+        Extract exact version from HTML query parameters or meta tags.
+        Priority:
+        1. Query parameters: ?v=X.Y.Z in asset URLs (Drupal 8+)
+        2. Meta Generator tag: <meta name="Generator" content="Drupal X ..." />
 
         @param url: the base URL to check
         @param timeout: request timeout in seconds
         @param headers: headers to pass to requests.get()
-        @return: version string (e.g., "11.2.10") or None if not found
+        @return: tuple (version_string, source) or (None, None) if not found
+                 source is 'query_param' or 'meta_generator'
         """
         try:
-            response = self.session.get(url, timeout=timeout, headers=headers, verify=False)
+            # Don't follow redirects - we want the HTML from the target URL, not a redirect destination
+            response = self.session.get(url, timeout=timeout, headers=headers, verify=False, allow_redirects=False)
 
             # Try to parse HTML even with non-200 status codes (some sites may return content)
             if response.status_code in [200, 403]:
+                # Method 1: Query parameters (?v=X.Y.Z)
                 # Pattern matches: /core/misc/drupal.js?v=11.2.10 or similar
                 # Looks for ?v= followed by semantic version (X.Y.Z)
                 pattern = r'\?v=(\d+\.\d+\.\d+)'
                 match = re.search(pattern, response.text)
 
                 if match:
-                    return match.group(1)
+                    return match.group(1), 'query_param'
+
+                # Method 2: Meta Generator tag
+                # Pattern matches: <meta name="Generator" content="Drupal 11 ..." />
+                # Also handles variations like generator, GENERATOR, etc.
+                generator_pattern = r'<meta\s+name=["\']?[Gg]enerator["\']?\s+content=["\']?Drupal\s+(\d+)'
+                generator_match = re.search(generator_pattern, response.text)
+
+                if generator_match:
+                    # Extract major version and return it as X.0.0 format for consistency
+                    major_version = generator_match.group(1)
+                    return f"{major_version}.0.0", 'meta_generator'
 
         except Exception:
             # Silently fail and let fingerprinting handle it
             pass
 
-        return None
+        return None, None
 
     def enumerate_version(self, url, threads=10, verb='head',
-            timeout=15, hide_progressbar=False, headers={}):
+            timeout=15, hide_progressbar=False, headers={}, no_fingerprint_fallback=False):
         """
-        Override parent method to try HTML parsing first, then fall back to fingerprinting.
+        Override parent method with priority-based version detection:
+        1. File fingerprinting (highest priority)
+           - If returns single version: use it (definitive)
+           - If returns multiple versions: use query parameter to disambiguate (unless no_fingerprint_fallback)
+        2. HTML query parameters (?v=X.Y.Z) - used to narrow down multiple fingerprints (unless no_fingerprint_fallback)
+        3. Meta Generator tag (backup/fallback) (disabled with no_fingerprint_fallback)
 
         @param url: the url to check
         @param threads: number of threads for fingerprinting
@@ -134,30 +154,57 @@ class Drupal(BasePlugin):
         @param timeout: request timeout in seconds
         @param hide_progressbar: whether to hide progress bar
         @param headers: headers to pass to requests
+        @param no_fingerprint_fallback: if True, only use file fingerprinting (no HTML fallbacks)
         @return: (possible_versions, is_empty)
         """
-        # Try to get exact version from HTML query parameters first
-        html_version = self.enumerate_version_from_html(url, timeout, headers)
-
-        # Always do fingerprinting for verification
+        # Priority 1: File fingerprinting (most accurate)
         fingerprint_versions, is_empty = super(Drupal, self).enumerate_version(
-            url, threads, verb, timeout, hide_progressbar, headers
+            url, threads, verb, timeout, hide_progressbar, headers, no_fingerprint_fallback
         )
 
-        if html_version:
-            # If we found a version in HTML, check if it's consistent with fingerprinting
-            if not fingerprint_versions or html_version in fingerprint_versions:
-                # HTML version is consistent, use it as the definitive answer
-                self.html_version_found = html_version
-                return [html_version], False
+        # If no_fingerprint_fallback mode is enabled, return fingerprint results without fallbacks
+        if no_fingerprint_fallback:
+            self.html_version_found = None
+            self.html_version_source = None
+            return fingerprint_versions, is_empty
+
+        if fingerprint_versions:
+            # Fingerprinting found versions
+            if len(fingerprint_versions) == 1:
+                # Single version found - definitive result (highest priority)
+                self.html_version_found = None
+                self.html_version_source = None
+                return fingerprint_versions, is_empty
             else:
-                # HTML version conflicts with fingerprinting - trust fingerprinting
-                # but store the HTML version for informational purposes
-                self.html_version_found = html_version
+                # Multiple versions found - try to narrow down with query parameter method
+                html_version, html_source = self.enumerate_version_from_html(url, timeout, headers)
+
+                if html_version and html_source == 'query_param':
+                    # Query parameter found - check if it matches one of the fingerprinted versions
+                    if html_version in fingerprint_versions:
+                        # Exact match - use query parameter to disambiguate
+                        self.html_version_found = html_version
+                        self.html_version_source = html_source
+                        return [html_version], False
+                    # Query parameter doesn't match fingerprints - trust fingerprinting
+
+                # Return multiple fingerprinted versions (couldn't narrow down)
+                self.html_version_found = None
+                self.html_version_source = None
                 return fingerprint_versions, is_empty
 
-        # No HTML version found, use fingerprinting results
+        # No fingerprinting results - try HTML methods (?v= parameter and meta Generator)
+        html_version, html_source = self.enumerate_version_from_html(url, timeout, headers)
+
+        if html_version:
+            # HTML method found a version
+            self.html_version_found = html_version
+            self.html_version_source = html_source
+            return [html_version], False
+
+        # No version found by any method
         self.html_version_found = None
+        self.html_version_source = None
         return fingerprint_versions, is_empty
 
 def load(app=None):

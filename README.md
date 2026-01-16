@@ -247,6 +247,28 @@ This is useful if you want to login via a browser and then use the session cooki
     droopescan scan drupal -u http://example.org --cookie "SESSd06e232=...; other=..."
 ```
 
+## Version Detection
+
+By default, droopescan uses a multi-layered approach for version detection to provide the most accurate results:
+
+1. **File fingerprinting** (most accurate) - Compares MD5 hashes of static files against known versions
+2. **HTML-based fallbacks** - Parses version information from HTML meta tags and query parameters when fingerprinting returns multiple versions
+
+### Fingerprint-Only Mode
+
+You can disable the HTML-based fallback methods and rely solely on file fingerprinting by using the `--no-fingerprint-fallback` flag:
+
+```
+    droopescan scan drupal -u http://example.org --no-fingerprint-fallback
+```
+
+This is useful when:
+- You want more deterministic results based only on file checksums
+- Fingerprinting returns multiple versions and you don't want automatic narrowing via HTML parsing
+- You're scanning sites where HTML meta tags may be misleading or modified
+
+**Note:** With this flag enabled, if fingerprinting identifies multiple possible versions, all possibilities will be returned without attempting to narrow them down.
+
 ## Output
 
 This application supports both "standard output", meant for human consumption,

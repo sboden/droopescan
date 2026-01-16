@@ -105,6 +105,7 @@ class BasePluginInternal(controller.CementBaseController):
         debug = pargs.debug
         resume = pargs.resume
         number = pargs.number if not pargs.number == 'all' else 100000
+        no_fingerprint_fallback = pargs.no_fingerprint_fallback
         if pargs.error_log:
             error_log = self._path(pargs.error_log, pwd)
         else:
@@ -178,7 +179,8 @@ class BasePluginInternal(controller.CementBaseController):
                     'verb': opts['verb'],
                     'threads': opts['threads_enumerate'],
                     'timeout': opts['timeout'],
-                    'headers': opts['headers']
+                    'headers': opts['headers'],
+                    'no_fingerprint_fallback': opts['no_fingerprint_fallback']
                 }
             },
             'interesting urls': {
@@ -260,7 +262,8 @@ class BasePluginInternal(controller.CementBaseController):
             a = requests.adapters.HTTPAdapter(pool_maxsize=5000)
             self.session.mount('http://', a)
             self.session.mount('https://', a)
-            self.session.cookies.set_policy(BlockAll())
+            if not opts['cookie']:
+                self.session.cookies.set_policy(BlockAll())
         except AttributeError:
             old_req = """Running a very old version of requests! Please `pip
                 install -U requests`."""
@@ -776,7 +779,7 @@ class BasePluginInternal(controller.CementBaseController):
         return found, len(found) == 0
 
     def enumerate_version(self, url, threads=10, verb='head',
-            timeout=15, hide_progressbar=False, headers={}):
+            timeout=15, hide_progressbar=False, headers={}, no_fingerprint_fallback=False):
         """
         Determines which version of CMS is installed at url. This is done by
         comparing file hashes against the database of hashes in
@@ -787,6 +790,7 @@ class BasePluginInternal(controller.CementBaseController):
         @param timeout: time, in seconds, before timing out a request.
         @param hide_progressbar: should the function hide the progressbar?
         @param headers: a dict of headers to pass to requests.get.
+        @param no_fingerprint_fallback: if True, only use file fingerprinting (no fallbacks).
         @return (possible_versions, is_empty)
         """
 
@@ -964,10 +968,18 @@ class BasePluginInternal(controller.CementBaseController):
         return f.process_host_line(line)
 
     def _generate_headers(self, host_header):
+        headers = {}
+
+        # Include session headers (User-Agent, Cookie, etc.)
+        if hasattr(self, 'session') and self.session and hasattr(self.session, 'headers'):
+            for k, v in self.session.headers.items():
+                headers[k] = v
+
+        # Override Host header if provided
         if host_header:
-            return {'Host': host_header}
-        else:
-            return None
+            headers['Host'] = host_header
+
+        return headers if headers else None
 
     def check_file_empty(self, file_location):
         """
