@@ -12,8 +12,7 @@ LABEL org.label-schema.name="droopescan" \
 COPY . /app
 WORKDIR /app
 RUN pip install setuptools && \
-    pip install -r requirements.txt && \
-    pip uninstall -y cement
-ENV PYTHONPATH=/app:$PYTHONPATH
+    pip install -r requirements.txt 
+ENV PYTHONPATH=/app
 ENTRYPOINT ["droopescan"]
 CMD ["--help"]
