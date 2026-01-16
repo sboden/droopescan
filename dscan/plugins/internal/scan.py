@@ -1,5 +1,6 @@
 from __future__ import print_function
 from cement.core import controller
+from cement import ex
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from copy import deepcopy
 from datetime import datetime
@@ -103,7 +104,7 @@ class Scan(BasePlugin):
                     Use this for more deterministic results.''', default=False)),
             ]
 
-    @controller.expose(hide=True)
+    @ex(hide=True)
     def default(self):
         opts = self._options(self.app.pargs)
         url_file_input = 'url_file' in opts

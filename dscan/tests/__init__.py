@@ -7,9 +7,14 @@ from dscan.plugins.drupal import Drupal
 from dscan.plugins import Scan
 from lxml import etree
 from mock import patch, MagicMock
+from nose.tools import raises
 import os
 import responses
 import dscan
+import unittest
+
+# Provide test.raises for backward compatibility with existing test code
+test.raises = raises
 
 BASE_URL = "http://adhwuiaihduhaknbacnckajcwnncwkakncw.com/"
 BASE_URL_HTTPS = "https://adhwuiaihduhaknbacnckajcwnncwkakncw.com/"
@@ -26,7 +31,7 @@ class MockHash():
         except KeyError:
             raise RuntimeError(url)
 
-class BaseTest(test.CementTestCase):
+class BaseTest(unittest.TestCase):
     app_class = DroopeScan
     scanner = None
 
@@ -72,16 +77,14 @@ class BaseTest(test.CementTestCase):
 
     def setUp(self):
         super(BaseTest, self).setUp()
-        self.reset_backend()
 
         defaults = init_defaults('DroopeScan', 'general')
         defaults['general']['pwd'] = os.getcwd()
-        self.app = DroopeScan(argv=[],
-            plugin_config_dir=dscan.PWD + "./plugins.d",
-            plugin_dir=dscan.PWD + "./plugins",
-            config_defaults=defaults)
+        # Cement 3: plugin directories are now configured in Meta class
+        self.app = DroopeScan(argv=[], config_defaults=defaults, catch_signals=None)
 
-        handler.register(Scan)
+        # Cement 3: register handlers via app instance
+        self.app.handler.register(Scan)
         self.app.testing = True
         self.app.setup()
         responses.add(responses.HEAD, self.base_url, status=200)
@@ -132,7 +135,8 @@ class BaseTest(test.CementTestCase):
         return m
 
     def controller_get(self, plugin_label):
-        return backend.__handlers__['controller'][plugin_label]
+        # Cement 3: use app.handler to get controllers
+        return self.app.handler.get('controller', plugin_label)
 
     def add_argv(self, argv):
         """

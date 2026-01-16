@@ -1,4 +1,5 @@
 from cement.core import handler, controller
+from cement import ex
 from dscan.plugins import BasePlugin
 from dscan.common.update_api import GitRepo
 import dscan.common.update_api as ua
@@ -43,7 +44,7 @@ class Drupal(BasePlugin):
     class Meta:
         label = 'drupal'
 
-    @controller.expose(help='drupal related scanning tools')
+    @ex(help='drupal related scanning tools')
     def drupal(self):
         self.plugin_init()
 
@@ -208,5 +209,5 @@ class Drupal(BasePlugin):
         return fingerprint_versions, is_empty
 
 def load(app=None):
-    handler.register(Drupal)
+    app.handler.register(Drupal)
 

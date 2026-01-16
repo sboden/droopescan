@@ -1,4 +1,5 @@
 from cement.core import handler, controller
+from cement import ex
 from copy import deepcopy
 from dscan.common.update_api import GitRepo
 from dscan.plugins import BasePlugin
@@ -36,11 +37,11 @@ class Wordpress(BasePlugin):
         label = 'wordpress'
 
     # This function is the entry point for the CMS.
-    @controller.expose(help='wordpress related scanning tools')
+    @ex(help='wordpress related scanning tools')
     def wordpress(self):
         self.plugin_init()
 
-    @controller.expose(help='alias for "wordpress"', hide=True)
+    @ex(help='alias for "wordpress"', hide=True)
     def wp(self):
         self.wordpress()
 
@@ -150,5 +151,5 @@ class Wordpress(BasePlugin):
         return fingerprint_versions, is_empty
 
 def load(app=None):
-    handler.register(Wordpress)
+    app.handler.register(Wordpress)
 

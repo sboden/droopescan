@@ -1,4 +1,5 @@
 from cement.core import handler, controller
+from cement import ex
 from concurrent.futures import ThreadPoolExecutor
 from dscan import common
 from dscan.plugins import BasePlugin
@@ -54,11 +55,11 @@ class Silverstripe(BasePlugin):
     class Meta:
         label = 'silverstripe'
 
-    @controller.expose(help='silverstripe related scanning tools')
+    @ex(help='silverstripe related scanning tools')
     def silverstripe(self):
         self.plugin_init()
 
-    @controller.expose(help='alias for "silverstripe"', hide=True)
+    @ex(help='alias for "silverstripe"', hide=True)
     def ss(self):
         self.silverstripe()
 
@@ -241,5 +242,5 @@ class Silverstripe(BasePlugin):
         return folders
 
 def load(app=None):
-    handler.register(Silverstripe)
+    app.handler.register(Silverstripe)
 

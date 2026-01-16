@@ -1,4 +1,5 @@
 from cement.core import handler, controller
+from cement import ex
 from dscan.plugins import HumanBasePlugin
 from subprocess import call
 import os, sys, dscan
@@ -42,7 +43,6 @@ class Tests(HumanBasePlugin):
         label = 'test'
         stacked_on = 'base'
         stacked_type = 'nested'
-        hide = True
         arguments = [
             (['-s', '--single-test'], dict(action='store', help='Name of test to run',
                 required=False, default=None)),
@@ -54,7 +54,7 @@ class Tests(HumanBasePlugin):
                 required=False, default=False)),
         ]
 
-    @controller.expose(help='', hide=True)
+    @ex(help='Run unit tests')
     def default(self):
         env = {}
         single_test = self.app.pargs.single_test
@@ -97,5 +97,5 @@ class Tests(HumanBasePlugin):
         sys.exit(exit)
 
 def load(app=None):
-    handler.register(Tests)
+    app.handler.register(Tests)
 

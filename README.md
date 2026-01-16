@@ -89,6 +89,20 @@ Because droopescan:
 * allows simultaneous scanning of multiple sites
 * is 100% python
 
+# Python Version Support
+
+This fork has been updated to support **Python 3.12** by upgrading from Cement 2.x to Cement 3.x. The following changes were made:
+
+* **Cement 3.0.14**: Updated from cement 2.6.x to 3.0.14 for Python 3.12 compatibility
+* **API Changes**: Updated to use cement 3.x APIs (Controller, App, ex decorator)
+* **Plugin Loading**: Migrated plugin loading mechanism to cement 3.x style
+
+**Supported Python versions:**
+* Python 3.8+
+* Python 3.12+ (fully supported)
+
+**Note:** The original droopescan using cement 2.6.x will fail on Python 3.12 with `ModuleNotFoundError: No module named 'imp'` because the `imp` module was removed in Python 3.12.
+
 # Installation
 
 ## With pip (recommended)
@@ -236,10 +250,11 @@ parameter:
 ```
     droopescan scan drupal -u example.org
 ```
-You can also omit the `drupal` argument. This will trigger “CMS identification”, like so:
+You can also omit the `drupal` argument. This will trigger "CMS identification" which automatically tests all available scanners to detect the CMS type:
 
 ```
     droopescan scan -u example.org
+    droopescan scan -u example.org -e v  # with version enumeration
 ```
 
 Multiple URLs may be scanned utilising the `-U` or `--url-file` parameter. This

@@ -1,5 +1,6 @@
 from __future__ import print_function
 from cement.core import handler, controller
+from cement import Controller
 from concurrent.futures import ThreadPoolExecutor
 from copy import deepcopy
 from datetime import datetime
@@ -36,7 +37,7 @@ except:
 
 DEFAULT_UA = 'Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.0'
 
-class BasePluginInternal(controller.CementBaseController):
+class BasePluginInternal(Controller):
     DEFAULT_UA = DEFAULT_UA
     NUMBER_DEFAULT = 'number_default'
     NUMBER_THEMES_DEFAULT = 350
