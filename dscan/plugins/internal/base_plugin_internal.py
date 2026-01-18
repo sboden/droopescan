@@ -98,6 +98,8 @@ class BasePluginInternal(Controller):
         timeout_host = pargs.timeout_host
         user_agent = pargs.user_agent
         cookie = pargs.cookie
+        if cookie and cookie.lower().startswith("cookie: "):
+            cookie = cookie[8:]
         hide_progressbar = pargs.hide_progressbar
         debug_requests = pargs.debug_requests
         follow_redirects = pargs.follow_redirects

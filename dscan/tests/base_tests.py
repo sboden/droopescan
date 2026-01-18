@@ -380,4 +380,72 @@ class BaseTests(BaseTest):
         plugins = plugins_base_get()
         assert len(plugins) > 3
 
+    def test_cookie_prefix_removal(self):
+        self.add_argv(['scan', 'drupal', '-u', 'http://example.org', '--cookie', 'Cookie: SESS123=abc; other=def'])
+        try:
+            self.app.run()
+        except:
+            pass
+        pargs = self.app.pargs
+        
+        opts = self.scanner._options(pargs)
+        assert opts['cookie'] == 'SESS123=abc; other=def'
+
+    def test_cookie_prefix_removal_case_insensitive(self):
+        self.add_argv(['scan', 'drupal', '-u', 'http://example.org', '--cookie', 'cookie: SESS123=abc; other=def'])
+        try:
+            self.app.run()
+        except:
+            pass
+        pargs = self.app.pargs
+        
+        opts = self.scanner._options(pargs)
+        assert opts['cookie'] == 'SESS123=abc; other=def'
+
+    def test_cookie_no_prefix_remains_unchanged(self):
+        self.add_argv(['scan', 'drupal', '-u', 'http://example.org', '--cookie', 'SESS123=abc; other=def'])
+        try:
+            self.app.run()
+        except:
+            pass
+        pargs = self.app.pargs
+        
+        opts = self.scanner._options(pargs)
+        assert opts['cookie'] == 'SESS123=abc; other=def'
+
+    def test_session_cookie_header_is_set(self):
+        from mock import MagicMock
+        pargs = MagicMock()
+        pargs.cookie = 'Cookie: SESS123=abc'
+        pargs.url_file = None
+        pargs.url = 'http://example.org'
+        pargs.enumerate = 'a'
+        pargs.verb = 'head'
+        pargs.method = None
+        pargs.output = 'standard'
+        pargs.timeout = 300
+        pargs.timeout_host = 1800
+        pargs.user_agent = 'Mozilla/5.0'
+        pargs.hide_progressbar = False
+        pargs.debug_requests = False
+        pargs.follow_redirects = True
+        pargs.plugins_base_url = None
+        pargs.themes_base_url = None
+        pargs.debug = False
+        pargs.resume = False
+        pargs.number = 10
+        pargs.no_fingerprint_fallback = False
+        pargs.error_log = None
+        pargs.host = None
+        pargs.threads = 4
+        pargs.threads_identify = None
+        pargs.threads_scan = None
+        pargs.threads_enumerate = None
+        pargs.massscan_override = False
+
+        opts = self.scanner._options(pargs)
+        self.scanner._general_init(opts)
+        
+        assert self.scanner.session.headers['Cookie'] == 'SESS123=abc'
+
 
