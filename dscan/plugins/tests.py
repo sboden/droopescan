@@ -46,10 +46,6 @@ class Tests(HumanBasePlugin):
         arguments = [
             (['-s', '--single-test'], dict(action='store', help='Name of test to run',
                 required=False, default=None)),
-            (['-3', '--just-three'], dict(action='store_true', help='Just run python 3 tests.',
-                required=False, default=True)),
-            (['-2', '--just-two'], dict(action='store_true', help='Just run python 2 tests.',
-                required=False, default=None)),
             (['-c', '--with-coverage'], dict(action='store_true', help='Do test coverage',
                 required=False, default=False)),
         ]
@@ -62,8 +58,6 @@ class Tests(HumanBasePlugin):
         env = {}
         single_test = self.app.pargs.single_test
         with_coverage = self.app.pargs.with_coverage
-        just_three = self.app.pargs.just_three
-        just_two = self.app.pargs.just_two
 
         if single_test and with_coverage:
             self.error('Cannot run with both -c and -s.')
@@ -78,8 +72,6 @@ class Tests(HumanBasePlugin):
                         '--cover-inclusive', '--cover-html']
 
             # Run tests using the found nosetests executable
-            # We ignore just_three/just_two flags regarding interpreter selection
-            # because we rely on the nosetests executable's environment.
             if call(call_base, env=env) != 0:
                 exit = 1
 

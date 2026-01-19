@@ -47,8 +47,6 @@ class TestCommandTests(unittest.TestCase):
         test_plugin.app = MagicMock()
         test_plugin.app.pargs.single_test = None
         test_plugin.app.pargs.with_coverage = False
-        test_plugin.app.pargs.just_three = True
-        test_plugin.app.pargs.just_two = None
         
         test_plugin.default()
         
@@ -69,8 +67,6 @@ class TestCommandTests(unittest.TestCase):
         test_plugin.app = MagicMock()
         test_plugin.app.pargs.single_test = None
         test_plugin.app.pargs.with_coverage = True
-        test_plugin.app.pargs.just_three = True
-        test_plugin.app.pargs.just_two = None
         
         test_plugin.default()
         
@@ -92,8 +88,6 @@ class TestCommandTests(unittest.TestCase):
         test_plugin.app = MagicMock()
         test_plugin.app.pargs.single_test = 'test_something'
         test_plugin.app.pargs.with_coverage = False
-        test_plugin.app.pargs.just_three = True
-        test_plugin.app.pargs.just_two = None
         
         test_plugin.default()
         
