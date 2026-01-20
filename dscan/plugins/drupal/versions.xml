@@ -909,6 +909,8 @@
       <version md5="c958b624e8dbcc166c17d0369ffc3500" nb="11.2.10"/>
       <version md5="60c1c7d1d18bb47d377b47be79140c7b" nb="11.3.0"/>
       <version md5="60c1c7d1d18bb47d377b47be79140c7b" nb="11.3.1"/>
+      <version md5="9f1fd3e4d2b79b105dbb8c8694d4410b" nb="10.6.2" />
+      <version md5="60c1c7d1d18bb47d377b47be79140c7b" nb="11.3.2" />
     </file>
     <file url="core/misc/tabledrag.js">
       <version md5="6d8457644f537cfa30d7c37d30a0166f" nb="8.0-alpha6"/>
@@ -1279,6 +1281,8 @@
       <version md5="307b46428da1f99f48c8652917edfac2" nb="11.2.10"/>
       <version md5="b0bd86c9bf812b18ab4bcbc2d44367bf" nb="11.3.0"/>
       <version md5="b0bd86c9bf812b18ab4bcbc2d44367bf" nb="11.3.1"/>
+      <version md5="8b09c7fe077cff285db7a1c79e71fa68" nb="10.6.2" />
+      <version md5="b0bd86c9bf812b18ab4bcbc2d44367bf" nb="11.3.2" />
     </file>
     <file url="core/misc/tableheader.js">
       <version md5="0eaa98381c98862665e4dec2354527a4" nb="8.0-alpha6"/>
@@ -1946,6 +1950,8 @@
       <version md5="5cbd34d41b798be9e00f7487bedb8cde" nb="11.2.10"/>
       <version md5="7de2204226d1546d37e9a19f93248fa4" nb="11.3.0"/>
       <version md5="7de2204226d1546d37e9a19f93248fa4" nb="11.3.1"/>
+      <version md5="1d2ec8a70880f9a94ad3e0ed74bc23a7" nb="10.6.2" />
+      <version md5="7de2204226d1546d37e9a19f93248fa4" nb="11.3.2" />
     </file>
     <file url="core/themes/claro/css/components/tables.css">
       <version md5="5821e8c0d0121a23680628400d926891" nb="9.2.4"/>
@@ -2124,6 +2130,8 @@
       <version md5="518617abaacd43b0b42012d800d9e0bc" nb="11.2.10"/>
       <version md5="9149e07453fa7f8bdc43e63fbc287c9e" nb="11.3.0"/>
       <version md5="9149e07453fa7f8bdc43e63fbc287c9e" nb="11.3.1"/>
+      <version md5="f092b00ddc8b099cf012c24586ece392" nb="10.6.2" />
+      <version md5="9149e07453fa7f8bdc43e63fbc287c9e" nb="11.3.2" />
     </file>
     <file url="core/themes/claro/css/base/elements.css">
       <version md5="ec279f237c64e4d4dfdea87730de2cae" nb="9.2.4"/>
@@ -2302,6 +2310,8 @@
       <version md5="02755644af4ac2aa8247ec96e572aabf" nb="11.2.10"/>
       <version md5="4e3e3be328fb0481a8c7eae2ddee8260" nb="11.3.0"/>
       <version md5="4e3e3be328fb0481a8c7eae2ddee8260" nb="11.3.1"/>
+      <version md5="ffa5002c48c27aab01b351192d9af1cf" nb="10.6.2" />
+      <version md5="4e3e3be328fb0481a8c7eae2ddee8260" nb="11.3.2" />
     </file>
     <file url="core/assets/vendor/jquery/jquery.min.js">
       <version md5="8fb8fee4fcc3cc86ff6c724154c49c42" nb="9.2.4"/>
@@ -2480,6 +2490,8 @@
       <version md5="6403b568d4d660ee53c35eac6ac55563" nb="11.2.10"/>
       <version md5="6403b568d4d660ee53c35eac6ac55563" nb="11.3.0"/>
       <version md5="6403b568d4d660ee53c35eac6ac55563" nb="11.3.1"/>
+      <version md5="2c872dbe60f4ba70fb85356113d8b35e" nb="10.6.2" />
+      <version md5="6403b568d4d660ee53c35eac6ac55563" nb="11.3.2" />
     </file>
     <file url="core/misc/drupal.init.js">
       <version md5="ae9a51af577045387c8ecd07c322b0c7" nb="8.3.0"/>
